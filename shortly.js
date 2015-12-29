@@ -2,7 +2,7 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
+//var cookieParser = require('cookie-parser');
 var db = require('./app/config');
 var Users = require('./app/collections/users');
 var User = require('./app/models/user');
@@ -18,7 +18,7 @@ app.set('view engine', 'ejs');
 app.use(partials());
 // Parse JSON (uniform resource locators)
 app.use(bodyParser.json());
-app.use(cookieParser());
+//app.use(cookieParser());
 // Parse forms (signup/login)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
@@ -27,17 +27,37 @@ app.use(express.static(__dirname + '/public'));
 
 app.get('/', 
 function(req, res) {
+  //checkuser(req,res);
   res.render('index');
+  
+});
+
+app.get('/login', 
+function(req, res) {
+  res.render('login');
+  
+});
+
+app.get('/signup', 
+function(req, res) {
+  res.render('signup');
   
 });
 
 app.get('/create', 
 function(req, res) {
+  // if (checkuser(req)){
+  //   res.render('index');
+  // } else {
+  //   res.redirect('login');
+  //   }
+  checkuser(req,res);
   res.render('index');
 });
 
 app.get('/links', 
 function(req, res) {
+
   Links.reset().fetch().then(function(links) {
     res.send(200, links.models);
   });
@@ -45,6 +65,7 @@ function(req, res) {
 
 app.post('/links', 
 function(req, res) {
+
   var uri = req.body.url;
 
   if (!util.isValidUrl(uri)) {
@@ -78,11 +99,19 @@ function(req, res) {
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
+var checkuser = function (req,res){
+
+  if( req.session === undefined ) {
+    res.redirect('login')
+  }
+
+};
 
 app.post('/signup', 
 function(req, res) {
+  res.render('signup');
   var uri = req.body.url;
-
+  console.log('in sign up');
 
   var data = {
     username: req.body.username,
@@ -91,9 +120,9 @@ function(req, res) {
    new User(data).save().then(function(model) {
     console.log('Everything is saved!');
     });
-
-
 });
+
+
 app.use(session({secret: 'ssshhhhh'}));
 app.post('/login', 
   function(req, res) {
@@ -102,55 +131,27 @@ app.post('/login',
     var userN = req.body.username;
     var password = req.body.password;
     console.log('in login');
-    new User({username: userN})
-    .fetch()
-    .then(function(model) {
-      if(model.get('password') === password){
+    new User({username: userN}).fetch().then(function(model) {
+      //console.log(model);
+      if (model === null){ 
+        console.log('in undefined model');
+        res.redirect('/signup');
+        
+      }
+      //console.log('model: ', model.get('password'));
+      else if(model.get('password') === password){
         console.log("I already exist!");
         /////////////ADDING SESSION//////////////
         //app.use(session({secret: 'ssshhhhh'}));
         
         req.session.name = userN;
-        //res.redirect('/');
+        res.redirect('/');
+        //console.log('req.session:',req.session);
 
-
-
-
-
-
-        ///////////ADDING SESSION///////////////
-
-
-
-
-        ///////////////////////ADDING COOKIE HERE////////////////////////
-          // check if client sent cookie
-          // console.log(req.cookies);
-          // var cookie = req.cookies.cookieName;
-          // if (cookie === undefined)
-          // {
-          //   // no: set a new cookie
-          //   var randomNumber=Math.random().toString();
-          //   randomNumber=randomNumber.substring(2,randomNumber.length);
-          //   res.cookie('cookieName','1234', { maxAge: 900000, httpOnly: true });
-          //   console.log('res.cookie after assign');
-          //   console.log('cookie created successfully');
-          // } 
-          // else
-          // {
-          //   // yes, cookie was already present 
-          //   console.log('cookie exists', cookie);
-          // } 
-          // // //next(); // <-- important!
-      //////////////////////////END OF ADDING COOKIE///////////////////
-      } else {
-        console.log("sign up first");
-      //redirect to signup page
-    }
+      } 
   });
 
-   
-
+  
 
 });
 
