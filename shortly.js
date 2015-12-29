@@ -38,6 +38,12 @@ function(req, res) {
   
 });
 
+app.get('/logout', 
+function(req, res) {
+  req.session = null;
+  res.render('login');
+});
+
 app.get('/signup', 
 function(req, res) {
   res.render('signup');

@@ -6,6 +6,7 @@ window.Shortly = Backbone.View.extend({
     'click li a.create': 'renderCreateView',
     'click li a.signup': 'renderSignupView',
     'click li a.login': 'renderLoginView',
+    'click li a.logout': 'renderLogoutView',
   },
 
   initialize: function(){
@@ -29,6 +30,7 @@ window.Shortly = Backbone.View.extend({
   },
 
   renderCreateView: function(e){
+    //check if the user has a cookie 
     e && e.preventDefault();
     this.router.navigate('/create', { trigger: true });
   },
@@ -43,6 +45,11 @@ window.Shortly = Backbone.View.extend({
     this.router.navigate('/login', { trigger: true });
   },
   
+  renderCreateView: function(e){
+  //check if the user has a cookie 
+  e && e.preventDefault();
+  this.router.navigate('/logout', { trigger: true });
+  },
   updateNav: function(routeName){
     this.$el.find('.navigation li a')
       .removeClass('selected')
