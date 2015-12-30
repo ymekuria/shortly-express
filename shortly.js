@@ -20,6 +20,10 @@ app.use(partials());
 app.use(bodyParser.json());
 //app.use(cookieParser());
 // Parse forms (signup/login)
+app.use(session({secret: 'ssshhhhh',
+                 resave: false,
+                 saveUninitialized: true 
+               }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
@@ -27,7 +31,8 @@ app.use(express.static(__dirname + '/public'));
 
 app.get('/', 
 function(req, res) {
- checkuser(req,res);
+  console.log('req.session in /', req.session);
+  checkuser(req,res);
   res.render('index');
   
 });
@@ -40,8 +45,10 @@ function(req, res) {
 
 app.get('/logout', 
 function(req, res) {
-  req.session = null;
-  res.render('login');
+  req.session.destroy(function(){
+    res.redirect('/login');
+  });
+  
 });
 
 app.get('/signup', 
@@ -52,11 +59,6 @@ function(req, res) {
 
 app.get('/create', 
 function(req, res) {
-  // if (checkuser(req)){
-  //   res.render('index');
-  // } else {
-  //   res.redirect('login');
-  //   }
   checkuser(req,res);
   res.render('index');
 });
@@ -105,11 +107,12 @@ function(req, res) {
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
-app.use(session({secret: 'ssshhhhh'}));
+
 var checkuser = function (req,res){
-  console.log('request name',req.session.name);
-  if( req.session.name === undefined ) {
-    res.redirect('login');
+ console.log('req.session',req.session);
+ var session = !!req.session.user; 
+  if( !session ) {
+    res.redirect('/login');
   }
 
 };
@@ -141,26 +144,23 @@ app.post('/login',
     var password = req.body.password;
     console.log('in login');
     new User({username: userN}).fetch().then(function(model) {
-      //console.log(model);
       if (model === null){ 
         console.log('in undefined model');
         res.redirect('/signup');
         
+      } else if(model.get('password') === password){
+          req.session.regenerate(function(){
+          req.session.user = userN;
+          console.log('req.session in login', req.session);
+          res.redirect('/');
+        });
+  
+        
       }
-      //console.log('model: ', model.get('password'));
-      else if(model.get('password') === password){
-        console.log("I already exist!");
-        /////////////ADDING SESSION//////////////
-        //app.use(session({secret: 'ssshhhhh'}));
-        
-        
-        req.session.name = userN;
-        console.log('req.session.user:',req.session.name)
-        res.redirect('/');
-        
-        //console.log('req.session:',req.session);
+    else {
+       res.redirect('login');
+    }    
 
-      } 
 
   });
 
