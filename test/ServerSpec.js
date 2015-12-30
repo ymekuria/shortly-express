@@ -213,30 +213,30 @@ describe('', function() {
 
   }); // 'Link creation'
 
-  // describe('Privileged Access:', function(){
+  describe('Privileged Access:', function(){
 
-  //   it('Redirects to login page if a user tries to access the main page and is not signed in', function(done) {
-  //     request('http://127.0.0.1:4568/', function(error, res, body) {
-  //       expect(res.req.path).to.equal('/login');
-  //       done();
-  //     });
-  //   });
+    it('Redirects to login page if a user tries to access the main page and is not signed in', function(done) {
+      request('http://127.0.0.1:4568/', function(error, res, body) {
+        expect(res.req.path).to.equal('/login');
+        done();
+      });
+    });
 
-  //   it('Redirects to login page if a user tries to create a link and is not signed in', function(done) {
-  //     request('http://127.0.0.1:4568/create', function(error, res, body) {
-  //       expect(res.req.path).to.equal('/login');
-  //       done();
-  //     });
-  //   });
+    it('Redirects to login page if a user tries to create a link and is not signed in', function(done) {
+      request('http://127.0.0.1:4568/create', function(error, res, body) {
+        expect(res.req.path).to.equal('/login');
+        done();
+      });
+    });
 
-  //   it('Redirects to login page if a user tries to see all of the links and is not signed in', function(done) {
-  //     request('http://127.0.0.1:4568/links', function(error, res, body) {
-  //       expect(res.req.path).to.equal('/login');
-  //       done();
-  //     });
-  //   });
+    it('Redirects to login page if a user tries to see all of the links and is not signed in', function(done) {
+      request('http://127.0.0.1:4568/links', function(error, res, body) {
+        expect(res.req.path).to.equal('/login');
+        done();
+      });
+    });
 
-  // }); // 'Priviledged Access'
+  }); // 'Priviledged Access'
 
   describe('Account Creation:', function(){
 

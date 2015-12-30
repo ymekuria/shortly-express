@@ -27,7 +27,7 @@ app.use(express.static(__dirname + '/public'));
 
 app.get('/', 
 function(req, res) {
-  //checkuser(req,res);
+ checkuser(req,res);
   res.render('index');
   
 });
@@ -105,17 +105,18 @@ function(req, res) {
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
+app.use(session({secret: 'ssshhhhh'}));
 var checkuser = function (req,res){
-
-  if( req.session === undefined ) {
-    res.redirect('login')
+  console.log('request name',req.session.name);
+  if( req.session.name === undefined ) {
+    res.redirect('login');
   }
 
 };
 
 app.post('/signup', 
 function(req, res) {
-  res.render('signup');
+  //res.render('signup');
   var uri = req.body.url;
   console.log('in sign up');
 
@@ -125,11 +126,13 @@ function(req, res) {
   }; 
    new User(data).save().then(function(model) {
     console.log('Everything is saved!');
+      
     });
+   res.redirect('/login');
 });
 
 
-app.use(session({secret: 'ssshhhhh'}));
+
 app.post('/login', 
   function(req, res) {
     var uri = req.body.url;
@@ -150,11 +153,15 @@ app.post('/login',
         /////////////ADDING SESSION//////////////
         //app.use(session({secret: 'ssshhhhh'}));
         
+        
         req.session.name = userN;
+        console.log('req.session.user:',req.session.name)
         res.redirect('/');
+        
         //console.log('req.session:',req.session);
 
       } 
+
   });
 
   
